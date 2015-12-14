@@ -35,10 +35,11 @@ public class Dane {
 
 	public Dane() {}
 	
-	public Dane(String polish, String latina, Integer dzial) {
-		this.nazwapolska = polish;
-		this.nazwalacinska = latina;
-		this.dzial = new Dzial(dzial);
+	public Dane(Object polish, Object latina, Object dzial) {
+		this.nazwapolska = (String)polish;
+		this.nazwalacinska = (String)latina;
+		Integer idDzial = (Integer)dzial;
+		this.dzial = new Dzial(idDzial);
 	}
 
 	public Integer getId() {

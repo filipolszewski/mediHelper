@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 
+import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
 
 public class MediKontroler {
@@ -38,7 +39,7 @@ public class MediKontroler {
 
 	public void doShowListWindow(Integer idDzial) {
 		List<Object[]> lista = dbConnector.getListaByDzial(idDzial);
-		ListWindow listWindow = new ListWindow(lista);
+		ListWindow listWindow = new ListWindow(lista, this);
 		listWindow.setVisible(true);
 	}
 
@@ -55,5 +56,10 @@ public class MediKontroler {
 			Integer id = (Integer) dzial;
 			dbConnector.addData(polish, latina, id);
 		}
+	}
+
+	public void doEditData(Object[] d, int column) {
+		Dane dane = new Dane(d[1], d[2], d[3]);
+		dbConnector.editDane(dane, column);
 	}
 }

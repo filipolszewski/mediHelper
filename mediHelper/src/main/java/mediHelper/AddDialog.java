@@ -38,7 +38,7 @@ public class AddDialog extends JDialog {
 	public AddDialog(MediKontroler controler, List<Dzial> listaDzialow) {
 		this.controler = controler;
 		this.listaDzialow = listaDzialow;
-		setSize(300, 200);
+		setSize(350, 200);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setTitle(TITLE);

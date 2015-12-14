@@ -129,4 +129,24 @@ public class DatabaseConnector {
 		});
 	}
 
+	public void editDane(Dane dane, int column) {
+		doWithEntityManager(new EntityManagerActivity() {
+			@Override
+			public Object run(EntityManager em) {
+				Dane editDane = em.find(Dane.class, dane.getId());
+				if (column == 0) {
+					editDane.setNazwapolska(dane.getNazwapolska());
+				} else {
+					editDane.setNazwalacinska(dane.getNazwalacinska());
+				}
+				
+				em.getTransaction().begin();
+				em.merge(editDane);
+				em.getTransaction().commit();
+				
+				return null;
+			}
+		});
+	}
+
 }
