@@ -43,21 +43,6 @@ public class MediKontroler {
 		listWindow.setVisible(true);
 	}
 
-	public void doAddDialog() {
-		AddDialog add = new AddDialog(this, dbConnector.getListaDzial());
-		add.setVisible(true);
-	}
-
-	public void doAddData(String polish, String latina, Object dzial) {
-		if (dzial.getClass().equals(String.class)) {
-			String nowyDzial = (String) dzial;
-			dbConnector.addDataAndDzial(polish, latina, nowyDzial);
-		} else {
-			Integer id = (Integer) dzial;
-			dbConnector.addData(polish, latina, id);
-		}
-	}
-
 	public void doEditData(Object[] d, int column) {
 		Dane dane = new Dane(d[1], d[2], d[3]);
 		dbConnector.editDane(dane, column);

@@ -2,9 +2,8 @@ package mediHelper;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -25,10 +24,18 @@ public class TestingPanel extends JPanel {
 	private static final Font MediumFont = new Font("SansSerif", Font.BOLD, 12);
 	private static final Font BigFont = new Font("SansSerif", Font.BOLD, 16);
 	private static final Font SmallFont = new Font("SansSerif", Font.BOLD, 10);
+	private JComboBox<Dzial> categoryBox;
+	private JComboBox<String> modeBox;
+	private TestingPanelKontroler kontroler;
 
 	public TestingPanel() {
 		setLayout(new BorderLayout(5, 5));
+		createControler();
 		createComponents();
+	}
+
+	private void createControler() {
+		kontroler = new TestingPanelKontroler(this);
 	}
 
 	private void createComponents() {
@@ -102,7 +109,7 @@ public class TestingPanel extends JPanel {
 		modeLabel.setForeground(Color.DARK_GRAY);
 		modePanel.add(modeLabel, "wrap");
 
-		JComboBox<String> modeBox = new JComboBox<>();
+		modeBox = new JComboBox<>();
 		modeBox.setFont(MediumFont);
 		modeBox.setForeground(Color.BLUE);
 		modeBox.addItem("Polski -> Łacina");
@@ -121,10 +128,8 @@ public class TestingPanel extends JPanel {
 		categoryLabel.setForeground(Color.DARK_GRAY);
 		categoryLabel.setFont(BigFont);
 
-		JComboBox<Dzial> categoryBox = new JComboBox<>();
-		List<Dzial> listaDzialow = new ArrayList<>();
-		listaDzialow.add(new Dzial("Kości kończyny dolnej"));
-		categoryBox = new JComboBox<Dzial>(new Vector<Dzial>(listaDzialow));
+		categoryBox = new JComboBox<Dzial>(new Vector<Dzial>(kontroler.getListaDzial()));
+		categoryBox.setMaximumSize(new Dimension(130, 100));
 		categoryBox.setForeground(Color.BLUE);
 		categoryBox.setFont(SmallFont);
 		catPanel.add(categoryBox);

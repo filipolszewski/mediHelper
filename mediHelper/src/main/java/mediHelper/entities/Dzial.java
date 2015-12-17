@@ -1,5 +1,7 @@
 package mediHelper.entities;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,10 +18,13 @@ public class Dzial {
 	
 	private String nazwa;
 	
+	private BigDecimal poprawnosc;
+	
 	public Dzial() {}
 	public Dzial(Integer id) {
 		this.id_dzial = id;
 		nazwa = "";
+		poprawnosc = new BigDecimal("100");
 	}
 
 	public Dzial(String nazwa) {
@@ -39,6 +44,12 @@ public class Dzial {
 
 	public void setNazwa(String nazwa) {
 		this.nazwa = nazwa;
+	}
+	public BigDecimal getPoprawnosc() {
+		return poprawnosc;
+	}
+	public void setPoprawnosc(BigDecimal poprawnosc) {
+		this.poprawnosc = poprawnosc;
 	}
 	@Override
 	public String toString() {

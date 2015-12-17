@@ -11,7 +11,7 @@ public class DataRow {
 	private String polishName;
 	
 	public DataRow(Integer id, String polishName, String latinaName, Dzial dzial, Integer failCount) {
-		super();
+
 		this.id = id;
 		this.polishName = polishName;
 		this.latinaName = latinaName;

@@ -87,40 +87,42 @@ public class DatabaseConnector {
 		Object run(EntityManager em);
 	}
 
-	public void addData(String polish, String latina, Integer dzial) {
+	public void addData(Dane data) {
 		doWithEntityManager(new EntityManagerActivity() {
 
 			@Override
 			public Object run(EntityManager em) {
-				Dane dane = new Dane(polish, latina, dzial);
 				em.getTransaction().begin();
-				em.persist(dane);
+				em.persist(data);
 				em.getTransaction().commit();
 				calcDataAmount();
 				return null;
 			}
 		});
+		getData("", null);
 	}
+
 	public void addDataAndDzial(String polish, String latina, String nowyDzial) {
 		doWithEntityManager(new EntityManagerActivity() {
 			@Override
 			public Object run(EntityManager em) {
 				Dzial dzial = new Dzial(nowyDzial);
-				
+
 				em.getTransaction().begin();
 				em.persist(dzial);
 				em.getTransaction().commit();
-				
+
 				Integer idDzial = getIdDzialByNazwa(nowyDzial);
-				addData(polish, latina, idDzial);
+				addData(new Dane(polish, latina, idDzial));
 				return null;
 			}
 		});
+		getData("", null);
 	}
 
 	protected Integer getIdDzialByNazwa(String nowyDzial) {
-		
-		return (Integer)doWithEntityManager(new EntityManagerActivity() {
+
+		return (Integer) doWithEntityManager(new EntityManagerActivity() {
 			@Override
 			public Object run(EntityManager em) {
 				Query query = em.createQuery("SELECT d.id_dzial FROM Dzial d WHERE nazwa = '" + nowyDzial + "'");
@@ -139,14 +141,70 @@ public class DatabaseConnector {
 				} else {
 					editDane.setNazwalacinska(dane.getNazwalacinska());
 				}
-				
+
 				em.getTransaction().begin();
 				em.merge(editDane);
 				em.getTransaction().commit();
-				
+
 				return null;
 			}
 		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public void getData(String string, Integer idDzial) {
+
+		List<Dane> lista = (List<Dane>) doWithEntityManager(new EntityManagerActivity() {
+
+			@Override
+			public Object run(EntityManager em) {
+
+				Query query;
+				if (idDzial != null) {
+					query = em.createQuery(
+							"Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d INNER JOIN Dzial dz with d.id_dzial = dz.id_dzial WHERE (id_dzial = "
+									+ idDzial + ")");
+				} else {
+					query = em.createQuery(
+							"Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d INNER JOIN d.dzial dz");
+				}
+
+				List<Object[]> objLista = query.getResultList();
+				List<Dane> dataRowLista = new ArrayList<>();
+				for (Object[] obj : objLista) {
+					dataRowLista.add(new Dane((Integer) obj[0], (String) obj[1], (String) obj[2], (Dzial) obj[3],
+							(Integer) obj[4]));
+				}
+				return dataRowLista;
+			}
+		});
+		listener.dataIsRead(lista);
+
+	}
+
+	public Dane getDataById(Integer id) {
+		return (Dane) doWithEntityManager(new EntityManagerActivity() {
+
+			@Override
+			public Object run(EntityManager em) {
+				return em.find(Dane.class, id);
+			}
+		});
+	}
+
+	public void editData(Dane data) {
+		doWithEntityManager(new EntityManagerActivity() {
+
+			@Override
+			public Object run(EntityManager em) {
+
+				em.getTransaction().begin();
+				em.merge(data);
+				em.getTransaction().commit();
+				return null;
+			}
+		});
+		getData("", null);
 	}
 
 }

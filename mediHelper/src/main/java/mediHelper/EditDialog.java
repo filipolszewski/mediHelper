@@ -17,11 +17,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
-public class AddDialog extends JDialog {
+public class EditDialog extends JDialog {
 
 	private static final String TITLE = "Dodawanie pojęć";
 	private static final Font FONT = new Font("Verdana", Font.BOLD, 11);
@@ -31,13 +32,47 @@ public class AddDialog extends JDialog {
 	private JComboBox<Dzial> dzialComboBox;
 	
 	private List<Dzial> listaDzialow;
-	private MediKontroler controler;
 	private JTextField newDzialField;
 	private JCheckBox checkBox;
+	private DataRow dataRow;
+	private boolean editingData;
+	private Integer id_dane;
+	public boolean userAccepted;
+	private Integer bledy;
 
-	public AddDialog(MediKontroler controler, List<Dzial> listaDzialow) {
-		this.controler = controler;
+	
+	
+	public EditDialog(List<Dzial> listaDzialow) {
+		
 		this.listaDzialow = listaDzialow;
+		launch();
+	}
+	
+	public void setDane(Dane dane) {
+		id_dane = dane.getId();
+		if (dane.getDzial() != null) {
+			Integer idDzial = dane.getDzial().getId_dzial();
+			for (int i = 0; i < dzialComboBox.getItemCount(); i++) {
+				if (idDzial.equals(dzialComboBox.getItemAt(i).getId_dzial())) {
+					dzialComboBox.setSelectedIndex(i);
+				}
+			}
+		} else {
+			dzialComboBox.insertItemAt(null, 0);
+			dzialComboBox.setSelectedIndex(0);
+		}
+
+		if (dane.getNazwapolska() != null) {
+			polishNameField.setText(dane.getNazwapolska());
+		}
+
+		if (dane.getNazwalacinska() != null) {
+			latinaNameField.setText(dane.getNazwalacinska());
+		}
+		bledy = dane.getBledy();
+	}
+	
+	private void launch() {
 		setSize(350, 200);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -64,10 +99,16 @@ public class AddDialog extends JDialog {
 	private void createAreasAndFiels(JPanel formPanel) {
 		addJLabelToPanel(formPanel, "Nazwa Polska:");
 		polishNameField = new JTextField(15);
+		if (editingData) {
+			polishNameField.setText(dataRow.getPolishName());
+		}
 		formPanel.add(polishNameField, "wrap, span");
 
 		addJLabelToPanel(formPanel, "Nazwa Łacińska:");
 		latinaNameField = new JTextField(15);
+		if (editingData) {
+			latinaNameField.setText(dataRow.getLatinaName());
+		}
 		formPanel.add(latinaNameField, "wrap, span");
 		
 		addJLabelToPanel(formPanel, "Dział:");
@@ -118,14 +159,8 @@ public class AddDialog extends JDialog {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Object dzial;
-				if (checkBox.isSelected()) {
-					dzial = newDzialField.getText();
-				} else {
-					dzial = dzialComboBox.getItemAt(dzialComboBox.getSelectedIndex()).getId_dzial();
-				}
-				controler.doAddData(polishNameField.getText(), latinaNameField.getText(), dzial);
-				AddDialog.this.dispose();
+				userAccepted = true;
+				dispose();
 			}
 		});
 		buttonPanel.add(addButton, BorderLayout.LINE_START);
@@ -135,12 +170,18 @@ public class AddDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AddDialog.this.dispose();
+				EditDialog.this.dispose();
 			}
 		});
 		buttonPanel.add(cancelButton, BorderLayout.LINE_END);
 		
 		mainPanel.add(buttonPanel, BorderLayout.PAGE_END);
 		
+	}
+
+	public Dane getData() {
+		Dane data = new Dane(id_dane, polishNameField.getText(), 
+				latinaNameField.getText(), (Dzial) dzialComboBox.getSelectedItem(), bledy);
+		return data;
 	}
 }

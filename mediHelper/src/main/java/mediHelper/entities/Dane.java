@@ -11,9 +11,7 @@ import javax.persistence.Table;
 
 /**
  * Klasa reprezentyjąca parę danych, jednocześnie encja dla JPA
- *
  * @author Filip Olszewski
- *
  */
 @Entity
 @Table(schema = "medi")
@@ -33,6 +31,8 @@ public class Dane {
 	@JoinColumn(name = "id_dzial")
 	private Dzial dzial;
 
+	@Column(name = "bledy")
+	private Integer bledy;
 	public Dane() {}
 	
 	public Dane(Object polish, Object latina, Object dzial) {
@@ -40,6 +40,14 @@ public class Dane {
 		this.nazwalacinska = (String)latina;
 		Integer idDzial = (Integer)dzial;
 		this.dzial = new Dzial(idDzial);
+		this.bledy = 0;
+	}
+	public Dane(Integer id, String polish, String latina, Dzial dzial, Integer bledy) {
+		this.id = id;
+		this.nazwapolska = polish;
+		this.nazwalacinska = latina;
+		this.dzial = dzial;
+		this.bledy = bledy;
 	}
 
 	public Integer getId() {
@@ -72,6 +80,14 @@ public class Dane {
 
 	public void setDzial(Dzial dzial) {
 		this.dzial = dzial;
+	}
+
+	public Integer getBledy() {
+		return bledy;
+	}
+
+	public void setBledy(Integer bledy) {
+		this.bledy = bledy;
 	}
 
 }
