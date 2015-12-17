@@ -34,8 +34,6 @@ public class EditDialog extends JDialog {
 	private List<Dzial> listaDzialow;
 	private JTextField newDzialField;
 	private JCheckBox checkBox;
-	private DataRow dataRow;
-	private boolean editingData;
 	private Integer id_dane;
 	public boolean userAccepted;
 	private Integer bledy;
@@ -43,7 +41,6 @@ public class EditDialog extends JDialog {
 	
 	
 	public EditDialog(List<Dzial> listaDzialow) {
-		
 		this.listaDzialow = listaDzialow;
 		launch();
 	}
@@ -99,16 +96,10 @@ public class EditDialog extends JDialog {
 	private void createAreasAndFiels(JPanel formPanel) {
 		addJLabelToPanel(formPanel, "Nazwa Polska:");
 		polishNameField = new JTextField(15);
-		if (editingData) {
-			polishNameField.setText(dataRow.getPolishName());
-		}
 		formPanel.add(polishNameField, "wrap, span");
 
 		addJLabelToPanel(formPanel, "Nazwa Łacińska:");
 		latinaNameField = new JTextField(15);
-		if (editingData) {
-			latinaNameField.setText(dataRow.getLatinaName());
-		}
 		formPanel.add(latinaNameField, "wrap, span");
 		
 		addJLabelToPanel(formPanel, "Dział:");
@@ -153,7 +144,7 @@ public class EditDialog extends JDialog {
 		JPanel buttonPanel = new JPanel(new BorderLayout());
 		buttonPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
-		JButton addButton = new JButton("Dodaj");
+		JButton addButton = new JButton("Zapisz");
 		addButton.setFont(FONT);
 		addButton.addActionListener(new ActionListener() {
 			
@@ -180,8 +171,7 @@ public class EditDialog extends JDialog {
 	}
 
 	public Dane getData() {
-		Dane data = new Dane(id_dane, polishNameField.getText(), 
+		return new Dane(id_dane, polishNameField.getText(), 
 				latinaNameField.getText(), (Dzial) dzialComboBox.getSelectedItem(), bledy);
-		return data;
 	}
 }

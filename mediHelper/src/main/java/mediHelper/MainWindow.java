@@ -1,5 +1,8 @@
 package mediHelper;
 
+//TODO Create and add Category Panel (Deleting categories + statistics)
+
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -17,22 +20,20 @@ import mediHelper.entities.Dane;
 public class MainWindow extends JFrame implements DatabaseListener {
 
 	private static final String TITLE = "MediHelper";
-	private MediKontroler controler;
+	private Kontroler controler;
 	private JLabel infoLabel;
 	private static final Font infoLblFont = new Font("Verdana", Font.BOLD, 12);
+	private DataPanel dataPanel;
 
 	public MainWindow() {
 		setSize(700, 450);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle(TITLE);
+		controler = new Kontroler(this);
 		createComponents();
-		createControler();
-	}
-
-	private void createControler() {
-		controler = new MediKontroler(this);
-		controler.doStart();
+		controler.doStartMainWindow();
+		dataPanel.startControler();
 	}
 
 	private void createComponents() {
@@ -61,7 +62,7 @@ public class MainWindow extends JFrame implements DatabaseListener {
 		TestingPanel testingPanel = new TestingPanel();
 		tabbedPane.add("Testy", testingPanel);
 
-		DataPanel dataPanel = new DataPanel();
+		dataPanel = new DataPanel(controler);
 		tabbedPane.add("Pojęcia", dataPanel);
 	}
 
@@ -72,5 +73,6 @@ public class MainWindow extends JFrame implements DatabaseListener {
 	}
 
 	@Override
-	public void dataIsRead(List<Dane> lista) {}
+	public void dataIsRead(List<Dane> lista) {
+	}
 }

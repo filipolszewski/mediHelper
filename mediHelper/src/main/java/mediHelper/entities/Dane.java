@@ -38,8 +38,7 @@ public class Dane {
 	public Dane(Object polish, Object latina, Object dzial) {
 		this.nazwapolska = (String)polish;
 		this.nazwalacinska = (String)latina;
-		Integer idDzial = (Integer)dzial;
-		this.dzial = new Dzial(idDzial);
+		this.dzial = (Dzial) dzial;
 		this.bledy = 0;
 	}
 	public Dane(Integer id, String polish, String latina, Dzial dzial, Integer bledy) {

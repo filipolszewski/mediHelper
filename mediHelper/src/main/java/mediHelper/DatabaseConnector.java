@@ -13,15 +13,12 @@ import mediHelper.entities.Dzial;
 
 public class DatabaseConnector {
 
-	private DatabaseListener listener;
+	private List<DatabaseListener> listeners;
 	private EntityManagerFactory emFactory;
-
-	public void setListener(DatabaseListener listener) {
-		this.listener = listener;
-	}
 
 	public DatabaseConnector() {
 		this.emFactory = Persistence.createEntityManagerFactory("MediHelper");
+		listeners = new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -47,12 +44,12 @@ public class DatabaseConnector {
 			@Override
 			public Object run(EntityManager em) {
 				Query query = em.createQuery("Select count(d) from Dane d");
-				System.out.println(query.getSingleResult());
 				return query.getSingleResult();
-
 			}
 		});
-		listener.dataAmount(numer.intValue());
+		for (DatabaseListener dL : listeners) {
+			dL.dataAmount(numer.intValue());
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -69,22 +66,6 @@ public class DatabaseConnector {
 				return lista;
 			}
 		});
-	}
-
-	private Object doWithEntityManager(EntityManagerActivity activity) {
-		EntityManager em = null;
-		try {
-			em = emFactory.createEntityManager();
-			return activity.run(em);
-		} finally {
-			if (em != null) {
-				em.close();
-			}
-		}
-	}
-
-	private static interface EntityManagerActivity {
-		Object run(EntityManager em);
 	}
 
 	public void addData(Dane data) {
@@ -131,29 +112,10 @@ public class DatabaseConnector {
 		});
 	}
 
-	public void editDane(Dane dane, int column) {
-		doWithEntityManager(new EntityManagerActivity() {
-			@Override
-			public Object run(EntityManager em) {
-				Dane editDane = em.find(Dane.class, dane.getId());
-				if (column == 0) {
-					editDane.setNazwapolska(dane.getNazwapolska());
-				} else {
-					editDane.setNazwalacinska(dane.getNazwalacinska());
-				}
-
-				em.getTransaction().begin();
-				em.merge(editDane);
-				em.getTransaction().commit();
-
-				return null;
-			}
-		});
-	}
-
 	@SuppressWarnings("unchecked")
 	public void getData(String string, Integer idDzial) {
 
+		//TODO implement search String queries
 		List<Dane> lista = (List<Dane>) doWithEntityManager(new EntityManagerActivity() {
 
 			@Override
@@ -161,9 +123,8 @@ public class DatabaseConnector {
 
 				Query query;
 				if (idDzial != null) {
-					query = em.createQuery(
-							"Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d INNER JOIN Dzial dz with d.id_dzial = dz.id_dzial WHERE (id_dzial = "
-									+ idDzial + ")");
+					query = em.createQuery("Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d "
+							+ "INNER JOIN d.dzial dz WHERE dz.id_dzial = " + idDzial);
 				} else {
 					query = em.createQuery(
 							"Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d INNER JOIN d.dzial dz");
@@ -178,7 +139,9 @@ public class DatabaseConnector {
 				return dataRowLista;
 			}
 		});
-		listener.dataIsRead(lista);
+		for (DatabaseListener l : listeners) {
+			l.dataIsRead(lista);
+		}
 
 	}
 
@@ -197,14 +160,55 @@ public class DatabaseConnector {
 
 			@Override
 			public Object run(EntityManager em) {
+				Dane editDane = em.find(Dane.class, data.getId());
+				editDane.setNazwapolska(data.getNazwapolska());
+				editDane.setNazwalacinska(data.getNazwalacinska());
+				editDane.setDzial(data.getDzial());
 
 				em.getTransaction().begin();
-				em.merge(data);
+				em.merge(editDane);
 				em.getTransaction().commit();
 				return null;
 			}
 		});
 		getData("", null);
+	}
+
+	public void deleteData(Integer id) {
+		doWithEntityManager(new EntityManagerActivity() {
+
+			@Override
+			public Object run(EntityManager em) {
+
+				em.getTransaction().begin();
+				Dane d = em.find(Dane.class, id);
+				em.remove(d);
+				em.getTransaction().commit();
+				return null;
+			}
+		});
+		calcDataAmount();
+		getData("", null);
+	}
+
+	private Object doWithEntityManager(EntityManagerActivity activity) {
+		EntityManager em = null;
+		try {
+			em = emFactory.createEntityManager();
+			return activity.run(em);
+		} finally {
+			if (em != null) {
+				em.close();
+			}
+		}
+	}
+
+	private static interface EntityManagerActivity {
+		Object run(EntityManager em);
+	}
+
+	public void addListener(DatabaseListener listener) {
+		listeners.add(listener);
 	}
 
 }

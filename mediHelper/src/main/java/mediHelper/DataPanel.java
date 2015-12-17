@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -21,80 +22,116 @@ import mediHelper.entities.Dzial;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
-public class DataPanel extends JPanel implements DatabaseListener{
+public class DataPanel extends JPanel implements DatabaseListener {
 
 	private JTable dataTable;
-	private DataKontroler kontroler;
+	private Kontroler kontroler;
 	private List<Dane> lista;
-	
-	public DataPanel() {
+	private JComboBox<Dzial> comboBox;
+	private JTextField searchField;
+
+	public DataPanel(Kontroler kontroler) {
+		this.kontroler = kontroler;
 		setLayout(new BorderLayout(5, 5));
 		createComponents();
-		kontroler = new DataKontroler(this);
-		kontroler.doStart();
+	}
+
+	public void startControler() {
+		kontroler.doStartDataPanel(this);
 	}
 
 	private void createComponents() {
 		createTopPanel();
-		createTable();	
+		createTable();
 	}
 
 	private void createTable() {
-		
+
 		dataTable = new JTable(40, 4);
 		dataTable.setRowSelectionAllowed(true);
 		dataTable.setFillsViewportHeight(true);
 		dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
+
 		JScrollPane scrollPane = new JScrollPane(dataTable);
 		scrollPane.setViewportView(dataTable);
 		add(scrollPane, BorderLayout.CENTER);
 	}
 
-	
-
 	private void createTopPanel() {
-		JPanel topPanel = new JPanel(new MigLayout());
+		JPanel topPanel = new JPanel(new BorderLayout(5, 5));
 		add(topPanel, BorderLayout.PAGE_START);
-		
+
 		JButton addBtn = new JButton("Dodaj");
 		addBtn.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				kontroler.doAddData();
-				
+
 			}
 		});
 		JButton editBtn = new JButton("Edytuj");
 		editBtn.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (dataTable.getSelectedRow() == -1) {
 					JOptionPane.showMessageDialog(null, "Wybierz wiersz przed edycją");
 				} else
 					kontroler.doEditData(lista.get(dataTable.getSelectedRow()).getId());
-				
+
 			}
 		});
 		JButton deleteBtn = new JButton("Usuń");
-		JComboBox<Dzial> comboBox = new JComboBox<>();
-		JTextField searchField = new JTextField(25);
+		deleteBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int reply = JOptionPane.showConfirmDialog(null, "Czy na pewno chcesz usunąć to pojęcie?");
+				if (reply == JOptionPane.YES_OPTION) {
+					Integer id = (Integer) lista.get(dataTable.getSelectedRow()).getId();
+					kontroler.doDelete(id);
+				}
+
+			}
+		});
+		comboBox = new JComboBox<Dzial>(new Vector<Dzial>(kontroler.getListaDzial()));
+		comboBox.insertItemAt(null, 0);
+		comboBox.setSelectedIndex(0);
+		comboBox.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				kontroler.doGetData(searchField.getText(), (Dzial) comboBox.getSelectedItem());
+
+			}
+		});
+		searchField = new JTextField(20);
 		JButton searchBtn = new JButton("Szukaj");
-		
-		topPanel.add(addBtn);
-		topPanel.add(editBtn);
-		topPanel.add(deleteBtn);
-		topPanel.add(comboBox, "gap left 20");
-		topPanel.add(searchField, "gap left 130");
-		topPanel.add(searchBtn, "align right");
+		searchBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				kontroler.doGetData(searchField.getText(), (Dzial) comboBox.getSelectedItem());
+			}
+		});
+
+		JPanel searchPanel = new JPanel(new MigLayout());
+		JPanel btnPanel = new JPanel(new MigLayout());
+		btnPanel.add(addBtn);
+		btnPanel.add(editBtn);
+		btnPanel.add(deleteBtn);
+		btnPanel.add(comboBox, "gap left 20");
+		searchPanel.add(searchField, "align right");
+		searchPanel.add(searchBtn, "align right");
+		topPanel.add(searchPanel, BorderLayout.LINE_END);
+		topPanel.add(btnPanel, BorderLayout.LINE_START);
 	}
-	
+
 	public JTable getDataTable() {
 		return dataTable;
 	}
-	
+
 	@Override
 	public void dataIsRead(List<Dane> lista) {
 
@@ -103,7 +140,7 @@ public class DataPanel extends JPanel implements DatabaseListener{
 
 			@Override
 			public Object getValueAt(int rowIndex, int columnIndex) {
-				
+
 				Object value = "??";
 				Dane dataRow = lista.get(rowIndex);
 				switch (columnIndex) {
@@ -148,12 +185,13 @@ public class DataPanel extends JPanel implements DatabaseListener{
 				return null;
 			}
 		});
-        TableColumn columnA = dataTable.getColumn("Błędy");
-        columnA.setMinWidth(40);
-        columnA.setMaxWidth(40);
+		TableColumn columnA = dataTable.getColumn("Błędy");
+		columnA.setMinWidth(40);
+		columnA.setMaxWidth(40);
 	}
 
 	@Override
-	public void dataAmount(Integer numer) {}
+	public void dataAmount(Integer numer) {
+	}
 
 }
