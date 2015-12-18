@@ -180,6 +180,18 @@ public class DatabaseConnector {
 			@Override
 			public Object run(EntityManager em) {
 
+				//usuwanie działu, jeżeli nie ma już pojęć z danego działu
+				Dane delData = em.find(Dane.class, id);
+				Integer idDzial = delData.getDzial().getId_dzial();
+				Query query = em.createQuery("SELECT count(d) FROM Dane d where id_dzial = " + idDzial);
+				Number num = (Number) query.getSingleResult();
+				if (num.intValue() == 0) {
+					em.getTransaction().begin();
+					Dzial dz = em.find(Dzial.class, idDzial);
+					em.remove(dz);
+					em.getTransaction().commit();
+				}
+				//
 				em.getTransaction().begin();
 				Dane d = em.find(Dane.class, id);
 				em.remove(d);
