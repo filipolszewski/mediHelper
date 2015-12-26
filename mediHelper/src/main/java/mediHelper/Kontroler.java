@@ -44,8 +44,13 @@ public class Kontroler {
 		dialog.setDane(dane);
 		dialog.setModal(true);
 		dialog.setVisible(true);
+		Dane d = dialog.getData();
 		if (dialog.userAccepted) {
-			dbConn.addData(dialog.getData());
+			if (dialog.isNewCategorySelected()) {
+				dbConn.addDataAndDzial(d.getId(), d.getNazwapolska(), d.getNazwalacinska(), d.getDzial().toString(), d.getBledy());
+			} else {
+				dbConn.addData(d);
+			}
 		}
 	}
 

@@ -76,14 +76,14 @@ public class DatabaseConnector {
 				em.getTransaction().begin();
 				em.persist(data);
 				em.getTransaction().commit();
-				calcDataAmount();
 				return null;
 			}
 		});
+		calcDataAmount();
 		getData("", null);
 	}
 
-	public void addDataAndDzial(String polish, String latina, String nowyDzial) {
+	public void addDataAndDzial(Integer id_dane, String polish, String latina, String nowyDzial, Integer bledy) {
 		doWithEntityManager(new EntityManagerActivity() {
 			@Override
 			public Object run(EntityManager em) {
@@ -92,21 +92,24 @@ public class DatabaseConnector {
 				em.getTransaction().begin();
 				em.persist(dzial);
 				em.getTransaction().commit();
-
-				Integer idDzial = getIdDzialByNazwa(nowyDzial);
-				addData(new Dane(polish, latina, idDzial));
+				
+				addData(new Dane(id_dane, polish, latina, dzial, bledy));
 				return null;
 			}
 		});
+		calcDataAmount();
 		getData("", null);
+		for (DatabaseListener listener : listeners) {
+			listener.categoryChange();
+		}
 	}
 
-	protected Integer getIdDzialByNazwa(String nowyDzial) {
+	protected Dzial getDzialByNazwa(String nowyDzial) {
 
-		return (Integer) doWithEntityManager(new EntityManagerActivity() {
+		return (Dzial) doWithEntityManager(new EntityManagerActivity() {
 			@Override
 			public Object run(EntityManager em) {
-				Query query = em.createQuery("SELECT d.id_dzial FROM Dzial d WHERE nazwa = '" + nowyDzial + "'");
+				Query query = em.createQuery("SELECT d FROM Dzial d WHERE nazwa = '" + nowyDzial + "'");
 				return query.getSingleResult();
 			}
 		});
@@ -115,7 +118,8 @@ public class DatabaseConnector {
 	@SuppressWarnings("unchecked")
 	public void getData(String string, Integer idDzial) {
 
-		//TODO implement search String queries
+		String sString = "'%" + string.toLowerCase() + "%'";
+		// TODO implement search String queries
 		List<Dane> lista = (List<Dane>) doWithEntityManager(new EntityManagerActivity() {
 
 			@Override
@@ -124,10 +128,13 @@ public class DatabaseConnector {
 				Query query;
 				if (idDzial != null) {
 					query = em.createQuery("Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d "
-							+ "INNER JOIN d.dzial dz WHERE dz.id_dzial = " + idDzial);
+							+ "INNER JOIN d.dzial dz WHERE ((dz.id_dzial = " + idDzial + ") AND "
+							+ "(lower(d.nazwapolska) LIKE " + sString + " OR " + "lower(d.nazwalacinska) LIKE " + sString + " OR "
+							+ "lower(dz.nazwa) LIKE " + sString + "))");
 				} else {
-					query = em.createQuery(
-							"Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d INNER JOIN d.dzial dz");
+					query = em.createQuery("Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d "
+							+ "INNER JOIN d.dzial dz WHERE (lower(d.nazwapolska) LIKE " + sString + " OR "
+							+ "lower(d.nazwalacinska) LIKE " + sString + " OR " + "lower(dz.nazwa) LIKE " + sString + ")");
 				}
 
 				List<Object[]> objLista = query.getResultList();
@@ -161,6 +168,19 @@ public class DatabaseConnector {
 			@Override
 			public Object run(EntityManager em) {
 				Dane editDane = em.find(Dane.class, data.getId());
+
+				if (!data.getDzial().equals(editDane.getDzial())) {
+					Integer idDzial = editDane.getDzial().getId_dzial();
+					Query query = em.createQuery("SELECT count(d) FROM Dane d where id_dzial = " + idDzial);
+					Number num = (Number) query.getSingleResult();
+					if (num.intValue() == 0) {
+						em.getTransaction().begin();
+						Dzial dz = em.find(Dzial.class, idDzial);
+						em.remove(dz);
+						em.getTransaction().commit();
+					}
+				}
+
 				editDane.setNazwapolska(data.getNazwapolska());
 				editDane.setNazwalacinska(data.getNazwalacinska());
 				editDane.setDzial(data.getDzial());
@@ -180,9 +200,16 @@ public class DatabaseConnector {
 			@Override
 			public Object run(EntityManager em) {
 
-				//usuwanie działu, jeżeli nie ma już pojęć z danego działu
+				// usuwanie działu, jeżeli nie ma już pojęć z danego działu
 				Dane delData = em.find(Dane.class, id);
-				Integer idDzial = delData.getDzial().getId_dzial();
+				Dzial dzial = delData.getDzial();
+				Integer idDzial = dzial.getId_dzial();
+
+				em.getTransaction().begin();
+				Dane d = em.find(Dane.class, id);
+				em.remove(d);
+				em.getTransaction().commit();
+
 				Query query = em.createQuery("SELECT count(d) FROM Dane d where id_dzial = " + idDzial);
 				Number num = (Number) query.getSingleResult();
 				if (num.intValue() == 0) {
@@ -190,12 +217,10 @@ public class DatabaseConnector {
 					Dzial dz = em.find(Dzial.class, idDzial);
 					em.remove(dz);
 					em.getTransaction().commit();
+					for (DatabaseListener listener : listeners) {
+						listener.categoryChange();
+					}
 				}
-				//
-				em.getTransaction().begin();
-				Dane d = em.find(Dane.class, id);
-				em.remove(d);
-				em.getTransaction().commit();
 				return null;
 			}
 		});

@@ -9,4 +9,6 @@ public interface DatabaseListener {
 	void dataAmount(Integer numer);
 
 	void dataIsRead(List<Dane> lista);
+
+	void categoryChange();
 }

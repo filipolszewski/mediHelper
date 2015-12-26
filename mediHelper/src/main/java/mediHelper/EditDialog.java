@@ -171,7 +171,15 @@ public class EditDialog extends JDialog {
 	}
 
 	public Dane getData() {
+		if(!checkBox.isSelected()) {
 		return new Dane(id_dane, polishNameField.getText(), 
 				latinaNameField.getText(), (Dzial) dzialComboBox.getSelectedItem(), bledy);
+		} else {
+			return new Dane(id_dane, polishNameField.getText(), latinaNameField.getText(), new Dzial(newDzialField.getText()), bledy);
+		}
+	}
+	
+	public boolean isNewCategorySelected() {
+		return checkBox.isSelected();
 	}
 }

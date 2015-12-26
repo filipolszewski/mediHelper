@@ -75,4 +75,7 @@ public class MainWindow extends JFrame implements DatabaseListener {
 	@Override
 	public void dataIsRead(List<Dane> lista) {
 	}
+
+	@Override
+	public void categoryChange() {}
 }

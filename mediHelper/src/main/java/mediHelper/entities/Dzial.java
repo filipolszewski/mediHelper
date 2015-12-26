@@ -29,6 +29,7 @@ public class Dzial {
 
 	public Dzial(String nazwa) {
 		this.nazwa = nazwa;
+		poprawnosc = new BigDecimal("100");
 	}
 	public int getId_dzial() {
 		return id_dzial;

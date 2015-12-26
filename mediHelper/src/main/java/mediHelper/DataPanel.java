@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -14,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
@@ -53,6 +55,7 @@ public class DataPanel extends JPanel implements DatabaseListener {
 		dataTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane scrollPane = new JScrollPane(dataTable);
+		scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 		scrollPane.setViewportView(dataTable);
 		add(scrollPane, BorderLayout.CENTER);
 	}
@@ -87,25 +90,16 @@ public class DataPanel extends JPanel implements DatabaseListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int reply = JOptionPane.showConfirmDialog(null, "Czy na pewno chcesz usunąć to pojęcie?");
-				if (reply == JOptionPane.YES_OPTION) {
-					Integer id = (Integer) lista.get(dataTable.getSelectedRow()).getId();
-					kontroler.doDelete(id);
+				if ((Integer) dataTable.getSelectedRow() >= 0) {
+					int reply = JOptionPane.showConfirmDialog(null, "Czy na pewno chcesz usunąć to pojęcie?");
+					if (reply == JOptionPane.YES_OPTION) {
+						Integer id = (Integer) lista.get(dataTable.getSelectedRow()).getId();
+						kontroler.doDelete(id);
+					}
 				}
-
 			}
 		});
-		comboBox = new JComboBox<Dzial>(new Vector<Dzial>(kontroler.getListaDzial()));
-		comboBox.insertItemAt(null, 0);
-		comboBox.setSelectedIndex(0);
-		comboBox.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				kontroler.doGetData(searchField.getText(), (Dzial) comboBox.getSelectedItem());
-
-			}
-		});
+		createComboBox();
 		searchField = new JTextField(20);
 		JButton searchBtn = new JButton("Szukaj");
 		searchBtn.addActionListener(new ActionListener() {
@@ -126,6 +120,20 @@ public class DataPanel extends JPanel implements DatabaseListener {
 		searchPanel.add(searchBtn, "align right");
 		topPanel.add(searchPanel, BorderLayout.LINE_END);
 		topPanel.add(btnPanel, BorderLayout.LINE_START);
+	}
+
+	private JComboBox<Dzial> createComboBox() {
+		comboBox = new JComboBox<Dzial>(new Vector<Dzial>(kontroler.getListaDzial()));
+		comboBox.insertItemAt(null, 0);
+		comboBox.setSelectedIndex(0);
+		comboBox.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				kontroler.doGetData(searchField.getText(), (Dzial) comboBox.getSelectedItem());
+			}
+		});
+		return comboBox;
 	}
 
 	public JTable getDataTable() {
@@ -192,6 +200,15 @@ public class DataPanel extends JPanel implements DatabaseListener {
 
 	@Override
 	public void dataAmount(Integer numer) {
+	}
+
+	@Override
+	public void categoryChange() {
+		comboBox.setModel(new DefaultComboBoxModel<Dzial>(new Vector<Dzial>(kontroler.getListaDzial())));
+		comboBox.insertItemAt(null, 0);
+		comboBox.setSelectedIndex(0);
+		this.revalidate();
+		this.repaint();
 	}
 
 }
