@@ -211,4 +211,7 @@ public class DataPanel extends JPanel implements DatabaseListener {
 		this.repaint();
 	}
 
+	@Override
+	public void nextQuestionGiven(Dane dane) {}
+
 }

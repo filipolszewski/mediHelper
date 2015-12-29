@@ -78,4 +78,7 @@ public class MainWindow extends JFrame implements DatabaseListener {
 
 	@Override
 	public void categoryChange() {}
+
+	@Override
+	public void nextQuestionGiven(Dane dane) {}
 }

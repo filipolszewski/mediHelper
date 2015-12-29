@@ -11,4 +11,6 @@ public interface DatabaseListener {
 	void dataIsRead(List<Dane> lista);
 
 	void categoryChange();
+
+	void nextQuestionGiven(Dane dane);
 }

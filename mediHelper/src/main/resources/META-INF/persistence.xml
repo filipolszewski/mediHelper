@@ -6,6 +6,7 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>mediHelper.entities.Dane</class>
 		<class>mediHelper.entities.Dzial</class>
+		<class>mediHelper.entities.Testresult</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
 			<property name="javax.persistence.jdbc.user" value="medi" />
