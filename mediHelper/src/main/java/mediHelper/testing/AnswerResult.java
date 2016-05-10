@@ -1,4 +1,4 @@
-package mediHelper;
+package mediHelper.testing;
 
 public class AnswerResult {
 	

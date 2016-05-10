@@ -1,4 +1,4 @@
-package mediHelper;
+package mediHelper.dao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ import javax.persistence.Query;
 
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
+import mediHelper.listener.DatabaseListener;
 
 public class DatabaseConnector {
 

@@ -1,12 +1,16 @@
-package mediHelper;
+package mediHelper.controler;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import mediHelper.dao.DatabaseTestsManager;
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
 import mediHelper.entities.Testresult;
+import mediHelper.listener.DatabaseListener;
+import mediHelper.testing.AnswerResult;
+import mediHelper.testing.TestStats;
 
 public class TestingPanelKontroler {
 

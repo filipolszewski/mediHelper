@@ -1,4 +1,4 @@
-package mediHelper;
+package mediHelper.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

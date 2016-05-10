@@ -1,9 +1,12 @@
-package mediHelper;
+package mediHelper.controler;
 
 import java.util.List;
 
+import mediHelper.dao.DatabaseConnector;
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
+import mediHelper.listener.DatabaseListener;
+import mediHelper.view.EditDialog;
 
 public class Kontroler {
 

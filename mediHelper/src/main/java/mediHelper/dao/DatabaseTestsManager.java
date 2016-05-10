@@ -1,4 +1,4 @@
-package mediHelper;
+package mediHelper.dao;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
 import mediHelper.entities.Testresult;
+import mediHelper.listener.DatabaseListener;
 
 public class DatabaseTestsManager {
 

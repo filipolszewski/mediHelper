@@ -1,4 +1,4 @@
-package mediHelper;
+package mediHelper.view;
 
 //TODO Create and add Category Panel (Deleting categories + statistics)
 
@@ -14,7 +14,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
+import mediHelper.controler.Kontroler;
 import mediHelper.entities.Dane;
+import mediHelper.listener.DatabaseListener;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame implements DatabaseListener {

@@ -1,4 +1,4 @@
-package mediHelper;
+package mediHelper.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,8 +18,12 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import mediHelper.controler.TestingPanelKontroler;
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
+import mediHelper.listener.DatabaseListener;
+import mediHelper.testing.AnswerResult;
+import mediHelper.testing.TestStats;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")

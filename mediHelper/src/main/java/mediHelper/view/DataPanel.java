@@ -1,4 +1,4 @@
-package mediHelper;
+package mediHelper.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -19,8 +19,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
+import mediHelper.controler.Kontroler;
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
+import mediHelper.listener.DatabaseListener;
 import net.miginfocom.swing.MigLayout;
 
 @SuppressWarnings("serial")
