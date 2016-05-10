@@ -54,11 +54,13 @@ public class TestingPanelKontroler {
 			if (answer.equals(currentQuestion.getNazwalacinska())) {
 				return new AnswerResult(stats.correctAnswer(), true);
 			} else
+				dbConn.incrementFailCount(currentQuestion);
 				return new AnswerResult(stats.wrongAnswer(), false);
 		} else {
 			if (answer.equals(currentQuestion.getNazwapolska())) {
 				return new AnswerResult(stats.correctAnswer(), true);
 			} else
+				dbConn.incrementFailCount(currentQuestion);
 				return new AnswerResult(stats.wrongAnswer(), false);
 		}
 	}

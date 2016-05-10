@@ -89,7 +89,7 @@ public class DatabaseTestsManager {
 				Query query = em.createQuery(
 						"SELECT sum(r.questionCount), sum(r.correctCount) FROM Testresult r WHERE r.dzial = '"
 								+ testDzial.getNazwa() + "'" );
-				List<Object[]> resultList = (List<Object[]>) query.getResultList();
+				List<Object[]> resultList = query.getResultList();
 				Object[] values = resultList.get(0);
 				em.getTransaction().begin();
 				Dzial dzial = em.find(Dzial.class, testDzial.getId_dzial());
@@ -102,6 +102,19 @@ public class DatabaseTestsManager {
 			}
 		});
 
+	}
+
+	public void incrementFailCount(Dane data) {
+		doWithEntityManager(new EntityManagerActivity() {
+			@Override
+			public Object run(EntityManager em) {
+				em.getTransaction().begin();
+				Dane dane = em.find(Dane.class, data.getId());
+				dane.setBledy(dane.getBledy() + 1);
+				em.getTransaction().commit();
+				return null;
+			}
+		});
 	}
 
 }
