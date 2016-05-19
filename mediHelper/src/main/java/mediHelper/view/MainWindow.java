@@ -49,7 +49,7 @@ public class MainWindow extends JFrame implements DatabaseListener {
 
 	public MainWindow() {
 		// Parametry okna
-		setSize(700, 450);
+		setSize(750, 450);
 		setLocationRelativeTo(null); // ustawia na środku ekranu
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle(TITLE);
