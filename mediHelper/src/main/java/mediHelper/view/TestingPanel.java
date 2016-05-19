@@ -91,6 +91,7 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 		answerResultLabel = new JLabel();
 		answerResultLabel.setHorizontalAlignment(JLabel.CENTER);
 		answerResultLabel.setFont(MediumFont);
+		answerResultLabel.setMaximumSize(new Dimension(400, 100));
 		testingPanel.add(answerResultLabel, BorderLayout.PAGE_START);
 
 		testingLabel = new JLabel("Wybierz opcje i naciśnij START");
@@ -119,7 +120,7 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 					answerResultLabel.setText("Dobrze!");
 				} else {
 					answerResultLabel.setForeground(Color.RED);
-					answerResultLabel.setText("Błędna odpowiedź. " + currentQuestion.getNazwapolska() + " - > "
+					answerResultLabel.setText(currentQuestion.getNazwapolska() + " - > "
 							+ currentQuestion.getNazwalacinska());
 				}
 				kontroler.getNextQuestion();
