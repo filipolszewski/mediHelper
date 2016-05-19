@@ -21,6 +21,8 @@ import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
 import net.miginfocom.swing.MigLayout;
 
+// klasa dziedzicząca po Swingowym JDialog, służąca do dodawania i edycji danych w widoku Danych
+
 @SuppressWarnings("serial")
 public class EditDialog extends JDialog {
 
@@ -45,6 +47,7 @@ public class EditDialog extends JDialog {
 		launch();
 	}
 	
+	// aktualizacja obiektów Swingowych danymi
 	public void setDane(Dane dane) {
 		id_dane = dane.getId();
 		if (dane.getDzial() != null) {
@@ -69,6 +72,7 @@ public class EditDialog extends JDialog {
 		bledy = dane.getBledy();
 	}
 	
+	// inizjalizacja
 	private void launch() {
 		setSize(350, 200);
 		setLocationRelativeTo(null);
@@ -170,6 +174,7 @@ public class EditDialog extends JDialog {
 		
 	}
 
+	// zebranie danych z obiektów Swing'owych
 	public Dane getData() {
 		if(!checkBox.isSelected()) {
 		return new Dane(id_dane, polishNameField.getText(), 
@@ -178,7 +183,7 @@ public class EditDialog extends JDialog {
 			return new Dane(id_dane, polishNameField.getText(), latinaNameField.getText(), new Dzial(newDzialField.getText()), bledy);
 		}
 	}
-	
+
 	public boolean isNewCategorySelected() {
 		return checkBox.isSelected();
 	}

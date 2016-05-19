@@ -1,5 +1,7 @@
 package mediHelper.dao;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,10 @@ import javax.persistence.Query;
 
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
+import mediHelper.entities.Stats;
 import mediHelper.listener.DatabaseListener;
+
+// Data Access Object spełniający wiele funkcji związanych z pracą na bazie danych
 
 public class DatabaseConnector {
 
@@ -22,8 +27,14 @@ public class DatabaseConnector {
 		listeners = new ArrayList<>();
 	}
 
+	// przechowywanie listenerów
+	public void addListener(DatabaseListener listener) {
+		listeners.add(listener);
+	}
+
+	// metoda pobierajaca liste działów
 	@SuppressWarnings("unchecked")
-	public List<Dzial> getListaDzial() {
+	public List<Dzial> getListOfCategories() {
 
 		return (List<Dzial>) doWithEntityManager(new EntityManagerActivity() {
 
@@ -38,6 +49,7 @@ public class DatabaseConnector {
 		});
 	}
 
+	// metoda sprawdzająca ilość rekrodów w tabeli Dane
 	public void calcDataAmount() {
 		Number numer = -1;
 
@@ -49,12 +61,13 @@ public class DatabaseConnector {
 			}
 		});
 		for (DatabaseListener dL : listeners) {
-			dL.dataAmount(numer.intValue());
+			dL.dataAmountDelivered(numer.intValue());
 		}
 	}
 
+	// metoda pobierająca dane w zależności od działu
 	@SuppressWarnings("unchecked")
-	public List<Object[]> getListaByDzial(Integer idDzial) {
+	public List<Object[]> getListOfDataByDzial(Integer idDzial) {
 
 		return (List<Object[]>) doWithEntityManager(new EntityManagerActivity() {
 
@@ -69,6 +82,7 @@ public class DatabaseConnector {
 		});
 	}
 
+	// metoda dodająca pojedyńczą parę pojęć
 	public void addData(Dane data) {
 		doWithEntityManager(new EntityManagerActivity() {
 
@@ -84,6 +98,8 @@ public class DatabaseConnector {
 		getData("", null);
 	}
 
+	// metoda dodająca pojedyńczą parę pojęć oraz nowo stworzony dział, do
+	// którego należą
 	public void addDataAndDzial(Integer id_dane, String polish, String latina, String nowyDzial, Integer bledy) {
 		doWithEntityManager(new EntityManagerActivity() {
 			@Override
@@ -93,7 +109,7 @@ public class DatabaseConnector {
 				em.getTransaction().begin();
 				em.persist(dzial);
 				em.getTransaction().commit();
-				
+
 				addData(new Dane(id_dane, polish, latina, dzial, bledy));
 				return null;
 			}
@@ -105,22 +121,23 @@ public class DatabaseConnector {
 		}
 	}
 
-	protected Dzial getDzialByNazwa(String nowyDzial) {
+	// metoda zwracająca obiekt klasy Dzial ze względu na nazwę
+	protected Dzial getDzialByName(String newCategory) {
 
 		return (Dzial) doWithEntityManager(new EntityManagerActivity() {
 			@Override
 			public Object run(EntityManager em) {
-				Query query = em.createQuery("SELECT d FROM Dzial d WHERE nazwa = '" + nowyDzial + "'");
+				Query query = em.createQuery("SELECT d FROM Dzial d WHERE nazwa = '" + newCategory + "'");
 				return query.getSingleResult();
 			}
 		});
 	}
 
+	// metoda szukająca danych ze względu na searchString i dział
 	@SuppressWarnings("unchecked")
-	public void getData(String string, Integer idDzial) {
+	public void getData(String searchString, Integer idDzial) {
 
-		String sString = "'%" + string.toLowerCase() + "%'";
-		// TODO implement search String queries
+		String sString = "'%" + searchString.toLowerCase() + "%'";
 		List<Dane> lista = (List<Dane>) doWithEntityManager(new EntityManagerActivity() {
 
 			@Override
@@ -130,12 +147,13 @@ public class DatabaseConnector {
 				if (idDzial != null) {
 					query = em.createQuery("Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d "
 							+ "INNER JOIN d.dzial dz WHERE ((dz.id_dzial = " + idDzial + ") AND "
-							+ "(lower(d.nazwapolska) LIKE " + sString + " OR " + "lower(d.nazwalacinska) LIKE " + sString + " OR "
-							+ "lower(dz.nazwa) LIKE " + sString + "))");
+							+ "(lower(d.nazwapolska) LIKE " + sString + " OR " + "lower(d.nazwalacinska) LIKE "
+							+ sString + " OR " + "lower(dz.nazwa) LIKE " + sString + "))");
 				} else {
 					query = em.createQuery("Select d.id, d.nazwapolska, d.nazwalacinska, dz, d.bledy FROM Dane d "
 							+ "INNER JOIN d.dzial dz WHERE (lower(d.nazwapolska) LIKE " + sString + " OR "
-							+ "lower(d.nazwalacinska) LIKE " + sString + " OR " + "lower(dz.nazwa) LIKE " + sString + ")");
+							+ "lower(d.nazwalacinska) LIKE " + sString + " OR " + "lower(dz.nazwa) LIKE " + sString
+							+ ")");
 				}
 
 				List<Object[]> objLista = query.getResultList();
@@ -153,6 +171,7 @@ public class DatabaseConnector {
 
 	}
 
+	// metoda zwracająca obiekt Dane ze względu na id
 	public Dane getDataById(Integer id) {
 		return (Dane) doWithEntityManager(new EntityManagerActivity() {
 
@@ -163,6 +182,7 @@ public class DatabaseConnector {
 		});
 	}
 
+	// metoda edytująca rekord w tabeli Dane
 	public void editData(Dane data) {
 		doWithEntityManager(new EntityManagerActivity() {
 
@@ -195,6 +215,7 @@ public class DatabaseConnector {
 		getData("", null);
 	}
 
+	// metoda usuwająca rekord w tabeli Dane po id
 	public void deleteData(Integer id) {
 		doWithEntityManager(new EntityManagerActivity() {
 
@@ -229,6 +250,72 @@ public class DatabaseConnector {
 		getData("", null);
 	}
 
+	// pobieranie danych do widoku statystyk. Pobierane i liczone są:
+	// ilość testów dla działu, sumy wszystkich pytań i wszystkich dobrych
+	// odpowiedzi, ilość błędów łącznie, potem ostatnia data i
+	// id ostatniego testu, potem jego wynik.
+
+	public void getStatsForCategory(String catName) {
+
+		Stats stats = (Stats) doWithEntityManager(new EntityManagerActivity() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public Object run(EntityManager em) {
+
+				Query countQuery = em.createQuery("SELECT count(t) FROM Testresult t where dzial = '" + catName + "'");
+				Number num = (Number) countQuery.getSingleResult();
+				Integer testCount = num.intValue();
+
+				Query questionQuery = em.createQuery(
+						"SELECT t.questionCount, t.correctCount FROM Testresult t where dzial = '" + catName + "'");
+
+				Integer questionCount = 0;
+				Integer correctCount = 0;
+
+				List<Object[]> resultList = questionQuery.getResultList();
+				for (Object[] o : resultList) {
+					questionCount += (Integer) o[0];
+					correctCount += (Integer) o[1];
+				}
+				Integer failCount = questionCount - correctCount;
+				BigDecimal overallAccuracy = calcAccuracy(questionCount, correctCount);
+
+				Query idQuery = em.createQuery(
+						"SELECT t.id FROM Testresult t where dzial = '" + catName + "' ORDER BY t.id DESC");
+				idQuery.setMaxResults(1);
+				Object result = idQuery.getSingleResult();
+				Integer id = (Integer) result;
+
+				Query dateQuery = em.createQuery("SELECT t.date FROM Testresult t where t.id = " + id);
+				String lastTestDate = (String) dateQuery.getSingleResult();
+
+				Query lastTestCountQuery = em
+						.createQuery("SELECT t.questionCount, t.correctCount FROM Testresult t where t.id = " + id);
+				Object[] result2 = (Object[]) lastTestCountQuery.getSingleResult();
+
+				BigDecimal lastTestAccuracy = calcAccuracy((Integer) result2[1], (Integer) result2[0]);
+
+				return new Stats(testCount, failCount, overallAccuracy, lastTestDate, lastTestAccuracy);
+			}
+
+			private BigDecimal calcAccuracy(Integer questionCount, Integer correctCount) {
+				BigDecimal accuracy = new BigDecimal("0");
+				if (questionCount != 0) {
+					accuracy = new BigDecimal(correctCount)
+							.divide(new BigDecimal(questionCount), 3, RoundingMode.HALF_EVEN)
+							.multiply(new BigDecimal("100")).setScale(1, RoundingMode.HALF_EVEN);
+				}
+				return accuracy;
+			}
+		});
+		for (DatabaseListener databaseListener : listeners) {
+			databaseListener.onStatsDelivered(stats);
+		}
+	}
+
+	// funkcja opakowująca wszystkie próby wykorzystania EntityManager w celu
+	// czystszego kodu i zamykania zasobu
 	private Object doWithEntityManager(EntityManagerActivity activity) {
 		EntityManager em = null;
 		try {
@@ -243,10 +330,6 @@ public class DatabaseConnector {
 
 	private static interface EntityManagerActivity {
 		Object run(EntityManager em);
-	}
-
-	public void addListener(DatabaseListener listener) {
-		listeners.add(listener);
 	}
 
 }

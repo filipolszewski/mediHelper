@@ -21,17 +21,20 @@ import javax.swing.border.LineBorder;
 import mediHelper.controler.TestingPanelKontroler;
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
+import mediHelper.entities.Stats;
 import mediHelper.listener.DatabaseListener;
 import mediHelper.testing.AnswerResult;
 import mediHelper.testing.TestStats;
 import net.miginfocom.swing.MigLayout;
 
+// klasa panelu testowania dziedzicząca po JPanel
+
 @SuppressWarnings("serial")
 public class TestingPanel extends JPanel implements DatabaseListener {
 
-	private static final Font MediumFont = new Font("SansSerif", Font.BOLD, 12);
-	private static final Font BigFont = new Font("SansSerif", Font.BOLD, 16);
-	private static final Font SmallFont = new Font("SansSerif", Font.BOLD, 10);
+	private static final Font MediumFont = new Font("Verdana", Font.PLAIN, 12);
+	private static final Font BigFont = new Font("Verdana", Font.PLAIN, 16);
+	private static final Font SmallFont = new Font("Verdana", Font.PLAIN, 10);
 	private JComboBox<Dzial> categoryBox;
 	private JComboBox<String> modeBox;
 	private TestingPanelKontroler kontroler;
@@ -55,6 +58,7 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 		kontroler = new TestingPanelKontroler(this);
 	}
 
+	// tworzenie całego widoku, paneli, obiektów Swing'owych
 	private void createComponents() {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -82,7 +86,6 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 
 	private void createTestingPanel(JPanel mainPanel) {
 		JPanel testingPanel = new JPanel(new BorderLayout(2, 2));
-		testingPanel.setBorder(new LineBorder(Color.GRAY));
 		mainPanel.add(testingPanel, BorderLayout.CENTER);
 
 		answerResultLabel = new JLabel();
@@ -212,6 +215,7 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 
 	}
 
+	// aktualizacja panelu statystyk tstu
 	protected void setStats(TestStats testStats) {
 		valueLabel1.setText("" + testStats.getMainCount());
 		valueLabel2.setText("" + testStats.getCorrectCount());
@@ -254,8 +258,19 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 		statsPanel.add(valueLabel4, "wrap");
 	}
 
+	// aktualizacja widoku po otrzymaniu kolejnych danych do testowania
 	@Override
-	public void dataAmount(Integer numer) {
+	public void nextQuestionGiven(Dane dane) {
+		currentQuestion = dane;
+		if (modeBox.getSelectedItem().toString().equals("Polski -> Łacina")) {
+			testingLabel.setText(dane.getNazwapolska());
+		} else {
+			testingLabel.setText(dane.getNazwalacinska());
+		}
+	}
+
+	@Override
+	public void dataAmountDelivered(Integer numer) {
 	}
 
 	@Override
@@ -267,13 +282,7 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 	}
 
 	@Override
-	public void nextQuestionGiven(Dane dane) {
-		currentQuestion = dane;
-		if (modeBox.getSelectedItem().toString().equals("Polski -> Łacina")) {
-			testingLabel.setText(dane.getNazwapolska());
-		} else {
-			testingLabel.setText(dane.getNazwalacinska());
-		}
+	public void onStatsDelivered(Stats stats) {
 	}
 
 }

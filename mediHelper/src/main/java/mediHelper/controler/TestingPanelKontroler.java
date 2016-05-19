@@ -12,6 +12,8 @@ import mediHelper.listener.DatabaseListener;
 import mediHelper.testing.AnswerResult;
 import mediHelper.testing.TestStats;
 
+// kontroler dla panelu testującego
+
 public class TestingPanelKontroler {
 
 	private DatabaseTestsManager dbConn;
@@ -32,6 +34,8 @@ public class TestingPanelKontroler {
 		return dbConn.getListaDzial();
 	}
 
+	// inicjalizacja testu - zapisanie obecnego trybu testowania i testowanego
+	// działu
 	public void startSession(String testMode, Dzial testDzial) {
 		testStart = new Date();
 		this.testMode = testMode;
@@ -39,11 +43,12 @@ public class TestingPanelKontroler {
 		stats = new TestStats();
 	}
 
+	// pobranie kolejnej pary pojęć
 	public void getNextQuestion() {
 		dbConn.getNextQuestion(testDzial);
-
 	}
 
+	// zakończneie testu, wysłanie wyników do bazy
 	public void stopSession() {
 
 		if (stats.getMainCount() != 0) {
@@ -53,6 +58,7 @@ public class TestingPanelKontroler {
 		}
 	}
 
+	// metoda analizująca odpowiedź udzieloną przez użytkownika
 	public AnswerResult registerAnswer(Dane currentQuestion, String answer) {
 		if (testMode.equals("Polski -> Łacina")) {
 			if (answer.equals(currentQuestion.getNazwalacinska())) {

@@ -8,6 +8,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * Klasa reprezentyjąca dział, jednocześnie encja dla JPA
+ * 
+ * @author Filip Olszewski
+ */
 @Entity
 @Table(schema = "medi")
 public class Dzial {

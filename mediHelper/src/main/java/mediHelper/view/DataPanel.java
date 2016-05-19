@@ -19,29 +19,32 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
-import mediHelper.controler.Kontroler;
+import mediHelper.controler.MainWindowController;
 import mediHelper.entities.Dane;
 import mediHelper.entities.Dzial;
+import mediHelper.entities.Stats;
 import mediHelper.listener.DatabaseListener;
 import net.miginfocom.swing.MigLayout;
+
+// Panel Danych (czyli zakładna druga) - widok z tabelą, możliwością wyszukiwania, dodawania, usuwania, edytowania danych 
 
 @SuppressWarnings("serial")
 public class DataPanel extends JPanel implements DatabaseListener {
 
 	private JTable dataTable;
-	private Kontroler kontroler;
+	private MainWindowController kontroler;
 	private List<Dane> lista;
 	private JComboBox<Dzial> comboBox;
 	private JTextField searchField;
 
-	public DataPanel(Kontroler kontroler) {
+	public DataPanel(MainWindowController kontroler) {
 		this.kontroler = kontroler;
 		setLayout(new BorderLayout(5, 5));
 		createComponents();
 	}
 
 	public void startControler() {
-		kontroler.doStartDataPanel(this);
+		kontroler.start(this);
 	}
 
 	private void createComponents() {
@@ -49,6 +52,7 @@ public class DataPanel extends JPanel implements DatabaseListener {
 		createTable();
 	}
 
+	// tworzenie tabeli
 	private void createTable() {
 
 		dataTable = new JTable(40, 4);
@@ -62,6 +66,8 @@ public class DataPanel extends JPanel implements DatabaseListener {
 		add(scrollPane, BorderLayout.CENTER);
 	}
 
+	// tworzenie panelu z przyciskami i wyszukiwaniem
+	// przyciskom dodaje ActionListenery
 	private void createTopPanel() {
 		JPanel topPanel = new JPanel(new BorderLayout(5, 5));
 		add(topPanel, BorderLayout.PAGE_START);
@@ -92,10 +98,10 @@ public class DataPanel extends JPanel implements DatabaseListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if ((Integer) dataTable.getSelectedRow() >= 0) {
+				if (dataTable.getSelectedRow() >= 0) {
 					int reply = JOptionPane.showConfirmDialog(null, "Czy na pewno chcesz usunąć to pojęcie?");
 					if (reply == JOptionPane.YES_OPTION) {
-						Integer id = (Integer) lista.get(dataTable.getSelectedRow()).getId();
+						Integer id = lista.get(dataTable.getSelectedRow()).getId();
 						kontroler.doDelete(id);
 					}
 				}
@@ -125,7 +131,7 @@ public class DataPanel extends JPanel implements DatabaseListener {
 	}
 
 	private JComboBox<Dzial> createComboBox() {
-		comboBox = new JComboBox<Dzial>(new Vector<Dzial>(kontroler.getListaDzial()));
+		comboBox = new JComboBox<Dzial>(new Vector<Dzial>(kontroler.getListOfCategories()));
 		comboBox.insertItemAt(null, 0);
 		comboBox.setSelectedIndex(0);
 		comboBox.addActionListener(new ActionListener() {
@@ -138,10 +144,12 @@ public class DataPanel extends JPanel implements DatabaseListener {
 		return comboBox;
 	}
 
+	// getter dla tabeli
 	public JTable getDataTable() {
 		return dataTable;
 	}
 
+	// metoda aktualizująca TableModel po otrzymaniu nowych danych
 	@Override
 	public void dataIsRead(List<Dane> lista) {
 
@@ -200,13 +208,10 @@ public class DataPanel extends JPanel implements DatabaseListener {
 		columnA.setMaxWidth(40);
 	}
 
-	@Override
-	public void dataAmount(Integer numer) {
-	}
-
+	// zmiana działu w combobox
 	@Override
 	public void categoryChange() {
-		comboBox.setModel(new DefaultComboBoxModel<Dzial>(new Vector<Dzial>(kontroler.getListaDzial())));
+		comboBox.setModel(new DefaultComboBoxModel<Dzial>(new Vector<Dzial>(kontroler.getListOfCategories())));
 		comboBox.insertItemAt(null, 0);
 		comboBox.setSelectedIndex(0);
 		this.revalidate();
@@ -214,6 +219,15 @@ public class DataPanel extends JPanel implements DatabaseListener {
 	}
 
 	@Override
-	public void nextQuestionGiven(Dane dane) {}
+	public void dataAmountDelivered(Integer numer) {
+	}
+
+	@Override
+	public void nextQuestionGiven(Dane dane) {
+	}
+
+	@Override
+	public void onStatsDelivered(Stats stats) {
+	}
 
 }

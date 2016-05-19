@@ -5,6 +5,8 @@ import javax.swing.UIManager;
 
 import mediHelper.view.MainWindow;
 
+// Klasa Main. Tworzy główne okno i dbając o bezpieczeństwo wątków pokazuje je na ekranie.
+
 public class MediHelperMain {
 	
 	public static void main(String[] args) {
@@ -19,6 +21,7 @@ public class MediHelperMain {
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			
+			@Override
 			public void run() {
 				mainWindow.setVisible(true);
 			}

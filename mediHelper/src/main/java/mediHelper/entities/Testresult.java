@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+// Encja JPA reprezentująca rekord tabeli testresult - dane dotyczące wyniku testu
+
 @Entity
 @Table(schema = "medi")
 public class Testresult {

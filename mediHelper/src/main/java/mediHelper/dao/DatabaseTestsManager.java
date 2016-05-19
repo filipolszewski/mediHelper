@@ -14,6 +14,8 @@ import mediHelper.entities.Dzial;
 import mediHelper.entities.Testresult;
 import mediHelper.listener.DatabaseListener;
 
+//Data Access Object dla kontrolera od testowania
+
 public class DatabaseTestsManager {
 
 	private DatabaseListener listener;
@@ -23,6 +25,13 @@ public class DatabaseTestsManager {
 		this.emFactory = Persistence.createEntityManagerFactory("MediHelper");
 	}
 
+	// przechowywanie listenerów
+	public void setListener(DatabaseListener listener) {
+		this.listener = listener;
+
+	}
+
+	// metoda pobierajaca liste działów
 	@SuppressWarnings("unchecked")
 	public List<Dzial> getListaDzial() {
 
@@ -39,6 +48,8 @@ public class DatabaseTestsManager {
 		});
 	}
 
+	// funkcja opakowująca wszystkie próby wykorzystania EntityManager w celu
+	// czystszego kodu i zamykania zasobu (analogicznie jak w DatabaseManager)
 	private Object doWithEntityManager(EntityManagerActivity activity) {
 		EntityManager em = null;
 		try {
@@ -55,14 +66,16 @@ public class DatabaseTestsManager {
 		Object run(EntityManager em);
 	}
 
+	// pobranie z bazy losowej pary pojęć
 	public void getNextQuestion(Dzial testDzial) {
 
 		Dane dane = (Dane) doWithEntityManager(new EntityManagerActivity() {
 			@Override
 			public Object run(EntityManager em) {
-				Query countQuery = em.createQuery("SELECT count(d) FROM Dane d WHERE d.dzial = " + testDzial.getId_dzial());
+				Query countQuery = em
+						.createQuery("SELECT count(d) FROM Dane d WHERE d.dzial = " + testDzial.getId_dzial());
 				Number number = (Number) countQuery.getSingleResult();
-				
+
 				Query query = em.createQuery("SELECT d FROM Dane d WHERE d.dzial = " + testDzial.getId_dzial());
 				query.setFirstResult((int) (number.intValue() * Math.random()));
 				query.setMaxResults(1);
@@ -72,11 +85,7 @@ public class DatabaseTestsManager {
 		listener.nextQuestionGiven(dane);
 	}
 
-	public void setListener(DatabaseListener listener) {
-		this.listener = listener;
-
-	}
-
+	// dodanie wyniku testu do bazy danych
 	public void addResult(Testresult result, Dzial testDzial) {
 
 		doWithEntityManager(new EntityManagerActivity() {
@@ -89,7 +98,7 @@ public class DatabaseTestsManager {
 
 				Query query = em.createQuery(
 						"SELECT sum(r.questionCount), sum(r.correctCount) FROM Testresult r WHERE r.dzial = '"
-								+ testDzial.getNazwa() + "'" );
+								+ testDzial.getNazwa() + "'");
 				List<Object[]> resultList = query.getResultList();
 				Object[] values = resultList.get(0);
 				em.getTransaction().begin();
@@ -98,13 +107,14 @@ public class DatabaseTestsManager {
 						.divide(BigDecimal.valueOf((long) values[0]), 3, BigDecimal.ROUND_DOWN));
 				dzial.setPoprawnosc(poprawnosc);
 				em.getTransaction().commit();
-				
+
 				return null;
 			}
 		});
 
 	}
 
+	// zwiększenie danej parze pojęć licnzika błędów o 1
 	public void incrementFailCount(Dane data) {
 		doWithEntityManager(new EntityManagerActivity() {
 			@Override

@@ -2,6 +2,8 @@ package mediHelper.testing;
 
 import java.math.BigDecimal;
 
+// klasa reprezentująca wynik zakończonego testu
+
 public class TestStats {
 
 	private Integer mainCount;
