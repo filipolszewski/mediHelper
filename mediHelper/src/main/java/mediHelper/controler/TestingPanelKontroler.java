@@ -51,7 +51,7 @@ public class TestingPanelKontroler {
 	// zakończneie testu, wysłanie wyników do bazy
 	public void stopSession() {
 
-		if (stats.getMainCount() != 0) {
+		if (stats.getMainCount() >= 2) {
 			Testresult result = new Testresult(df.format(testStart), testMode, testDzial, stats.getMainCount(),
 					stats.getCorrectCount(), stats.getPercentage());
 			dbConn.addResult(result, testDzial);

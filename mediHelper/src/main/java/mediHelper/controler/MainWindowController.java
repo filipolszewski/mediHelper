@@ -55,7 +55,8 @@ public class MainWindowController {
 		dialog.setModal(true);
 		dialog.setVisible(true);
 		Dane d = dialog.getData();
-		if (dialog.userAccepted) {
+		if (dialog.userAccepted && d.getDzial() != null && !d.getNazwapolska().equals("")
+				&& !d.getNazwalacinska().equals("")) {
 			if (dialog.isNewCategorySelected()) {
 				dbConn.addDataAndDzial(d.getId(), d.getNazwapolska(), d.getNazwalacinska(), d.getDzial().toString(), d.getBledy());
 			} else {

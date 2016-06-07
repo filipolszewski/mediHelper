@@ -193,6 +193,7 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 					kontroler.startSession((String) modeBox.getSelectedItem(), (Dzial) categoryBox.getSelectedItem());
 					kontroler.getNextQuestion();
 					submitButton.setEnabled(true);
+					submitButton.setFocusable(true);
 					setStats(new TestStats());
 					modeBox.setEnabled(false);
 					categoryBox.setEnabled(false);
@@ -205,6 +206,7 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 					submitButton.setEnabled(false);
 					testingLabel.setText("Wybierz opcje i naciśnij START");
 					answerResultLabel.setText("");
+					clearStats();
 				}
 
 			}
@@ -221,6 +223,13 @@ public class TestingPanel extends JPanel implements DatabaseListener {
 		valueLabel2.setText("" + testStats.getCorrectCount());
 		valueLabel3.setText("" + testStats.getWrongCount());
 		valueLabel4.setText("" + testStats.getPercentage().intValue());
+	}
+
+	private void clearStats() {
+		valueLabel1.setText("--");
+		valueLabel2.setText("--");
+		valueLabel3.setText("--");
+		valueLabel4.setText("--");
 	}
 
 	private void createStatLabels(JPanel statsPanel) {

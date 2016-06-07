@@ -294,7 +294,7 @@ public class DatabaseConnector {
 						.createQuery("SELECT t.questionCount, t.correctCount FROM Testresult t where t.id = " + id);
 				Object[] result2 = (Object[]) lastTestCountQuery.getSingleResult();
 
-				BigDecimal lastTestAccuracy = calcAccuracy((Integer) result2[1], (Integer) result2[0]);
+				BigDecimal lastTestAccuracy = calcAccuracy((Integer) result2[0], (Integer) result2[1]);
 
 				return new Stats(testCount, failCount, overallAccuracy, lastTestDate, lastTestAccuracy);
 			}
